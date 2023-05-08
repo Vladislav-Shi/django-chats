@@ -1,26 +1,50 @@
 from django.contrib.auth.models import User
 from rest_framework import status
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import ChatRoom, ChatMessage
-from .serializers import ChatRoomSerializer, ChatMessageSerializer, UserRegisterSerializer
+from .serializers import ChatRoomSerializer, ChatMessageSerializer, UserRegisterSerializer, UserSerializer
+
+
+class SingleChatViews(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, chat_id: int):
+        context = ChatRoom.objects.get(id=chat_id)
+        serializer = ChatRoomSerializer(context, many=False)
+        return Response(serializer.data)
 
 
 class ChatViews(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
+        """Инфо о доступном спсике чатов"""
         context = ChatRoom.objects.filter(users=request.user)
         serializer = ChatRoomSerializer(context, many=True)
         return Response(serializer.data)
 
     def post(self, request):
         """Создать чат"""
-        pass
+        chat = ChatRoom.objects.create(
+            name=request.data['name'],
+            autor=request.user,
+        )
+        try:
+            users_username = [user['username'] for user in request.data['users']]
+            chat_users = User.objects.filter(username__in=users_username)
+            chat.users.set(chat_users)
+            chat.users.add(request.user)
+            chat.save()
+            serializer = ChatRoomSerializer(chat, many=False)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except:
+            chat.delete()
+            return Response({'message': 'error'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class MessageHistory(APIView):
@@ -32,6 +56,7 @@ class MessageHistory(APIView):
         return Response(serializer.data)
 
     def post(self, request):
+        ChatMessage.objects.create()
         """Новое сообщение в чате"""
         pass
 
@@ -54,3 +79,16 @@ class UserAPIRegister(CreateAPIView):
             return Response(response_data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserAPI(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+    def get_queryset(self):
+        queryset = User.objects.all()
+        author = self.request.query_params.get('author', None)
+        if author == '0':
+            queryset = User.objects.exclude(username=self.request.user.username)
+        return queryset
