@@ -1,0 +1,4 @@
+/poetry.lock
+/.venv/
+/.idea
+/base_chat/db.sqlite3

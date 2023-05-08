@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "django-chats"
+version = "0.1.0"
+description = ""
+authors = ["Vladislav-Shi <vlad.shirobockow@yandex.ru>"]
+readme = "README.md"
+packages = [{include = "django_chats"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+django = "^4.2"
+uvicorn = "^0.21.1"
+gunicorn = "^20.1.0"
+channels = {extras = ["daphne"], version = "^4.0.0"}
+channels-redis = "^4.1.0"
+djangorestframework = "^3.14.0"
+djangorestframework-simplejwt = "^5.2.2"
+django-cors-headers = "^3.14.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
