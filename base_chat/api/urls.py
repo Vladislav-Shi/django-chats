@@ -8,5 +8,4 @@ urlpatterns = [
     path('chat/<int:chat_id>/messages/', MessageHistory.as_view()),
     path('user/register/', UserAPIRegister.as_view()),
     path('user/list/', UserAPI.as_view()),
-
 ]

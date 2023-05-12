@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
@@ -21,6 +22,9 @@ class ChatRoom(models.Model):
 
     chat_size = property(_get_count_users)
 
+    def __str__(self):
+        return f'{self.pk}: {self.name}'
+
     class Meta:
         ordering = ['create_at']
 
@@ -36,3 +40,18 @@ class ChatMessage(models.Model):
     )
     is_event = models.BooleanField(verbose_name='техническое сообщение', default=0)
     create_at = models.DateTimeField(auto_now_add=True)
+
+
+class ChatUser(AbstractUser):
+    avatar = models.ImageField(
+        verbose_name='Аватар пользователя',
+        blank=True,
+        null=True,
+        upload_to='avatar')
+
+    def __str__(self):
+        return f'{self.pk}: {self.username}'
+
+    class Meta:
+        verbose_name = 'User'
+        verbose_name_plural = 'Users'

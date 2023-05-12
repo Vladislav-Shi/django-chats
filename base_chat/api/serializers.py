@@ -1,13 +1,13 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from .models import ChatRoom, ChatMessage
+from .models import ChatRoom, ChatMessage, ChatUser
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
-        fields = ['id', 'username']
+        model = ChatUser
+        fields = ['avatar', 'id', 'username']
 
 
 class ChatRoomSerializer(serializers.ModelSerializer):
@@ -41,12 +41,12 @@ class UserRegisterSerializer(serializers.Serializer):
         if data['password1'] != data['password1']:
             raise serializers.ValidationError('Пароли не совпадают')
         try:
-            User.objects.filter(username=data['username']).first()
-        except User.DoesNotExist:
+            ChatUser.objects.filter(username=data['username']).first()
+        except ChatUser.DoesNotExist:
             raise serializers.ValidationError('Пользователь с таким именем уже существует')
         try:
-            User.objects.filter(email=data['email']).first()
-        except User.DoesNotExist:
+            ChatUser.objects.filter(email=data['email']).first()
+        except ChatUser.DoesNotExist:
             raise serializers.ValidationError('Пользователь с таким email уже существует')
         return data
 
@@ -54,7 +54,5 @@ class UserRegisterSerializer(serializers.Serializer):
         pass
 
     def create(self, validated_data):
-        print('validated_data\n\n', validated_data)
-        return User.objects.create_user(**{'username': validated_data['username'], 'email': validated_data['email'],
+        return ChatUser.objects.create_user(**{'username': validated_data['username'], 'email': validated_data['email'],
                                            'password': validated_data['password1']})
-

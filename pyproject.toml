@@ -16,6 +16,7 @@ channels-redis = "^4.1.0"
 djangorestframework = "^3.14.0"
 djangorestframework-simplejwt = "^5.2.2"
 django-cors-headers = "^3.14.0"
+pillow = "^9.5.0"
 
 
 [build-system]

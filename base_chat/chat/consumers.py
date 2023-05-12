@@ -80,7 +80,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 {
                     'type': 'chat_message',
                     'message': msg.text,
-                    'autor': str(self.scope["user"]),
+                    'autor': str(self.scope["user"].username),
                     'date': str(msg.create_at)
                 }
             )
